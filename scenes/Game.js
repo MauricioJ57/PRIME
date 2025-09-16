@@ -17,6 +17,19 @@ export default class Game extends Phaser.Scene {
 
   create() {
     //-- IMAGENES ESTATICAS --
+    this.cameras.main.setBackgroundColor(0x00ff00);
+    
+        this.add.rectangle(180, 384, 30, 800, 0x0000ff).setOrigin(0.5, 0.5);
+        
+        this.add.rectangle(820, 384, 30, 800, 0x0000ff).setOrigin(0.5, 0.5);
+
+        this.add.rectangle(350, 384, 10, 800, 0x0000ff).setOrigin(0.5, 0.5);
+
+        this.add.rectangle(500, 384, 10, 800, 0x0000ff).setOrigin(0.5, 0.5);
+
+        this.add.rectangle(650, 384, 10, 800, 0x0000ff).setOrigin(0.5, 0.5);
+
+        this.add.image(512, 384, 'background').setAlpha(0.5);
 
     //-- BICICLETA --
     this.bici = this.physics.add.sprite(450, 500, "placeholder de bici");
@@ -26,6 +39,9 @@ export default class Game extends Phaser.Scene {
     this.camion = this.physics.add.image(450, 100, "placeholder de camion");
     this.camion.setCollideWorldBounds(true);
     this.camion.setDepth(10);
+    this.camion.setScale(4);
+    this.camion.setBounce(1);
+    this.camion.setVelocityX(100);
 
     //-- CONTROLES
     this.controles = this.input.keyboard.createCursorKeys();
@@ -38,7 +54,25 @@ export default class Game extends Phaser.Scene {
       piedra.setVelocityY(-300);
     });
 
+    this.camionobjetos = this.physics.add.group();
+
+      this.lanzarpiedra = this.time.addEvent({
+            delay: 1500,
+            callback: () => {
+              const camionobjeto = this.camionobjetos.create(this.camion.x, this.camion.y + 20, 'placeholder de piedra');
+              camionobjeto.setVelocityY(200);
+          },
+          loop: true
+      })
+
     //-- COLISIONES --
+    this.physics.add.overlap(this.camionobjetos, this.bici, (camionobjeto, bici) => {
+            bici.disableBody(true, true);
+        }, null, this);
+
+        this.physics.add.overlap(this.camion, this.piedras, (camion, piedras) => {
+            piedras.disableBody(true, true);
+        }, null, this);
   }
 
   update() {
@@ -50,6 +84,15 @@ export default class Game extends Phaser.Scene {
     } else {
       this.bici.setVelocityX(0);
     }
+
+    if (this.camion.x >= 750) {
+                this.camion.setVelocityX(-100);
+                this.camion.setFlipX(true); 
+            }
+            if (this.camion.x <= 250) {
+                this.camion.setVelocityX(100);
+                this.camion.setFlipX(false);
+            }
 
   }
 }
